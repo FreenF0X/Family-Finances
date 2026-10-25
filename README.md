@@ -24,7 +24,7 @@
 
 ## Статус проекта
 
-- [ ] Этап 0: подготовка репозитория
+- [x] Этап 0: подготовка репозитория
 - [ ] Этап 1: ядро Budget Service (CRUD + PostgreSQL)
 - [ ] Этап 2: Auth Service + JWT
 - [ ] Этап 3: gRPC между Budget и Analytics
