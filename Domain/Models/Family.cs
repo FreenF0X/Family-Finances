@@ -1,6 +1,6 @@
 ﻿using System.Security.Principal;
 
-namespace BudgetService.Entities
+namespace Domain.Models
 {
     public class Family
     {

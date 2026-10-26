@@ -1,4 +1,4 @@
-﻿namespace BudgetService.Entities
+﻿namespace Domain.Models
 {
     public class Transaction
     {

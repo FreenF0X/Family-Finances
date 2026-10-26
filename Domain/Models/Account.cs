@@ -1,6 +1,6 @@
 ﻿using System.Transactions;
 
-namespace BudgetService.Entities
+namespace Domain.Models
 {
     public class Account
     {
