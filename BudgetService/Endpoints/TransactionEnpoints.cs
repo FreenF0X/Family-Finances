@@ -16,7 +16,7 @@ namespace BudgetService.Endpoints
                 try
                 {
                     // TODO: Позже заменим этот хардкод на реальный ID из JWT-токена
-                    var hardcodedUserId = Guid.Parse("11111111-1111-1111-1111-111111111111");
+                    var hardcodedUserId = Guid.Parse("0dab9965-2e3e-4f0d-a3de-491526a10410");
 
                     var transaction = await service.CreateAsync(
                         request.AccountId,
