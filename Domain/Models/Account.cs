@@ -8,10 +8,8 @@ namespace Domain.Models
         public Guid FamilyId { get; set; }
         public string Name { get; set; } = string.Empty;
         public string Currency { get; set; } = "RUB"; // По умолчанию рубли
-
-        // Хранимый баланс. Тип decimal!
         public decimal Balance { get; set; }
-
+        public bool IsClosed { get; set; } = false;
         public DateTime CreatedAt { get; set; }
 
         // Навигационные свойства

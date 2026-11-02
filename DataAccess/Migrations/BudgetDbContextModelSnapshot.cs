@@ -43,6 +43,11 @@ namespace DataAccess.Migrations
                     b.Property<Guid>("FamilyId")
                         .HasColumnType("uuid");
 
+                    b.Property<bool>("IsClosed")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)

@@ -27,6 +27,10 @@ namespace DataAccess.Configurations
                 .WithMany(f => f.Accounts)
                 .HasForeignKey(a => a.FamilyId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Property(a => a.IsClosed)
+                .IsRequired()
+                .HasDefaultValue(false);
         }
     }
 }
