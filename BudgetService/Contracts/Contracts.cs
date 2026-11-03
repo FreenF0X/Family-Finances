@@ -21,7 +21,6 @@
         Guid AccountId,
         Guid CategoryId,
         decimal Amount,
-        int Type, // 1 - Expense, 2 - Income
         DateTime Date,
         string? Comment
     );

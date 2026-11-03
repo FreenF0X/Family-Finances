@@ -22,7 +22,6 @@ namespace BusinesLogic
             Guid accountId,
             Guid categoryId,
             decimal amount,
-            TransactionType type,
             DateTime date,
             string? comment,
             Guid userId)
@@ -51,14 +50,14 @@ namespace BusinesLogic
                 CategoryId = categoryId,
                 UserId = userId,
                 Amount = amount,
-                Type = type,
+                Type = category.Type,
                 Date = date,
                 Comment = comment,
                 CreatedAt = DateTime.UtcNow
             };
 
             // 4. МЕНЯЕМ БАЛАНС (Бизнес-логика)
-            if (type == TransactionType.Expense)
+            if (category.Type == TransactionType.Expense)
             {
                 account.Balance -= amount;
             }
