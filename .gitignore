@@ -6,6 +6,10 @@
 #Файлы конфигураций
 appsettings.json
 
+#Окружение
+.env
+
+
 # User-specific files
 *.rsuser
 *.suo

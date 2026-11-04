@@ -25,7 +25,7 @@
 ## —татус проекта
 
 - [x] Ётап 0: подготовка репозитори€
-- [ ] Ётап 1: €дро Budget Service (CRUD + PostgreSQL)
+- [x] Ётап 1: €дро Budget Service (CRUD + PostgreSQL)
 - [ ] Ётап 2: Auth Service + JWT
 - [ ] Ётап 3: gRPC между Budget и Analytics
 - [ ] Ётап 4: Kafka и событи€

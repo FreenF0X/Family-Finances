@@ -22,7 +22,6 @@ namespace BudgetService.Endpoints
                         request.AccountId,
                         request.CategoryId,
                         request.Amount,
-                        (TransactionType)request.Type,
                         request.Date,
                         request.Comment,
                         hardcodedUserId);

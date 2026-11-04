@@ -1,0 +1,27 @@
+﻿# 1. Базовый образ для запуска (Runtime)
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+EXPOSE 7140
+EXPOSE 5244
+WORKDIR /app
+
+# 2. Образ для сборки (SDK)
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+
+# Копируем csproj и восстанавливаем зависимости (для кэширования слоев)
+COPY ["BudgetService/BudgetService.csproj", "BudgetService/"]
+COPY ["BusinesLogic/BusinesLogic.csproj", "BusinesLogic/"]
+COPY ["DataAccess/DataAccess.csproj", "DataAccess/"]
+COPY ["Domain/Domain.csproj", "Domain/"]
+RUN dotnet restore "BudgetService/BudgetService.csproj"
+
+# Копируем все остальные файлы и собираем
+COPY . .
+WORKDIR "/src/BudgetService"
+RUN dotnet publish "BudgetService.csproj" -c Release -o /app/publish /p:UseAppHost=false
+
+# 3. Финальный образ
+FROM base AS final
+WORKDIR /app
+COPY --from=build /app/publish .
+ENTRYPOINT ["dotnet", "BudgetService.dll"]
