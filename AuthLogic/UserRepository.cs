@@ -13,14 +13,14 @@ namespace AuthLogic
             _connectionFactory = connectionFactory;
         }
 
-        public async Task<User> GetByEmailAsync(string email)
+        public async Task<AppUser> GetByEmailAsync(string email)
         {
             using var connection = _connectionFactory.CreateConnection();
             var sql = "SELECT * FROM Users WHERE Email = @Email";
-            return await connection.QuerySingleOrDefaultAsync<User>(sql, new { Email = email });
+            return await connection.QuerySingleOrDefaultAsync<AppUser>(sql, new { Email = email });
         }
 
-        public async Task<int> CreateAsync(User user)
+        public async Task<int> CreateAsync(AppUser user)
         {
             using var connection = _connectionFactory.CreateConnection();
             var sql = @"INSERT INTO Users (Email, PasswordHash) 

@@ -15,6 +15,6 @@
 
         // Навигационные свойства
         public Family Family { get; set; } = null!;
-        public User User { get; set; } = null!;
+        public AppUser User { get; set; } = null!;
     }
 }

@@ -10,7 +10,7 @@ namespace DataAccess
         {
         }
 
-        public DbSet<User> Users { get; set; }
+        public DbSet<AppUser> Users { get; set; }
         public DbSet<Family> Families { get; set; }
         public DbSet<FamilyMember> FamilyMembers { get; set; }
         public DbSet<Account> Accounts { get; set; }

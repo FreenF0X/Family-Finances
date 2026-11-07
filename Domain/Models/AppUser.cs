@@ -2,10 +2,10 @@
 
 namespace Domain.Models
 {
-    public class User
+    public class AppUser
     {
         public Guid Id { get; set; }
-        public string Login { get; set; } = string.Empty;
+        public string DisplayName { get; set; } = string.Empty;
         public string PasswordHash { get; set; } = string.Empty;
         public string? Email { get; set; }
         public DateTime CreatedAt { get; set; }
