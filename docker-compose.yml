@@ -1,5 +1,5 @@
 services:
-  postgres:
+  budget_postgres:
     image: postgres:16-alpine
     environment:
       POSTGRES_USER: ${DB_USER}

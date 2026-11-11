@@ -1,0 +1,19 @@
+services:
+  auth_postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: qwerty
+      POSTGRES_DB: auth_db
+    ports:
+      - "5434:5432"
+    volumes:
+      - auth_postgres_data:/var/lib/auth_postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  auth_postgres_data:

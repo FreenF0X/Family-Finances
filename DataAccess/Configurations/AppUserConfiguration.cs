@@ -10,18 +10,11 @@ namespace DataAccess.Configurations
         {
             builder.HasKey(u => u.Id);
 
-            builder.Property(u => u.Login)
+            builder.Property(u => u.DisplayName)
                 .IsRequired()
                 .HasMaxLength(50);
 
-            builder.HasIndex(u => u.Login).IsUnique(); // Логин уникален
-
-            builder.Property(u => u.PasswordHash)
-                .IsRequired()
-                .HasMaxLength(255);
-
-            builder.Property(u => u.Email)
-                .HasMaxLength(100);
+            builder.Property(u => u.CreatedAt);
         }
     }
 }

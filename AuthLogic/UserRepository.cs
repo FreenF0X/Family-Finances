@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Npgsql;
 using Domain.Models;
+using System.Data.Common;
 
 namespace AuthLogic
 {
@@ -13,20 +14,36 @@ namespace AuthLogic
             _connectionFactory = connectionFactory;
         }
 
-        public async Task<AppUser> GetByEmailAsync(string email)
+        public async Task<IdentityUser?> GetByLoginAsync(string login)
         {
             using var connection = _connectionFactory.CreateConnection();
-            var sql = "SELECT * FROM Users WHERE Email = @Email";
-            return await connection.QuerySingleOrDefaultAsync<AppUser>(sql, new { Email = email });
+            const string sql = @"
+            SELECT * FROM identity_users 
+            WHERE login = @Login";
+            return await connection.QueryFirstOrDefaultAsync<IdentityUser>(sql, new { Login = login });
         }
 
-        public async Task<int> CreateAsync(AppUser user)
+        public async Task CreateAsync(IdentityUser user)
         {
             using var connection = _connectionFactory.CreateConnection();
-            var sql = @"INSERT INTO Users (Email, PasswordHash) 
-                    VALUES (@Email, @PasswordHash) 
-                    RETURNING Id";
-            return await connection.ExecuteScalarAsync<int>(sql, user);
+            const string sql = @"
+            INSERT INTO identity_users 
+                (id, login, password_hash, email, created_at, refresh_token, refresh_token_expiry_time)
+            VALUES 
+                (@Id, @Login, @PasswordHash, @Email, @CreatedAt, @RefreshToken, @RefreshTokenExpiryTime)";
+            await connection.ExecuteAsync(sql, user);
+        }
+
+        public async Task UpdateRefreshTokenAsync(Guid id, string? refreshToken, DateTime? expiry)
+        {
+            using var connection = _connectionFactory.CreateConnection();
+            const string sql = @"
+            UPDATE identity_users 
+            SET refresh_token = @RefreshToken, 
+                refresh_token_expiry_time = @Expiry
+            WHERE id = @Id";
+
+            await connection.ExecuteAsync(sql, new { Id = id, RefreshToken = refreshToken, Expiry = expiry });
         }
     }
 }

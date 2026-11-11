@@ -9,8 +9,8 @@ namespace AuthLogic
 {
     public interface IUserRepository
     {
-        public Task<AppUser> GetByEmailAsync(string email);
-
-        public Task<int> CreateAsync(AppUser user);
+        Task<IdentityUser?> GetByLoginAsync(string login);
+        Task CreateAsync(IdentityUser user);
+        Task UpdateRefreshTokenAsync(Guid id, string? refreshToken, DateTime? expiry);
     }
 }
