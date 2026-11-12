@@ -1,6 +1,10 @@
 using AuthLogic;
 using Dapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.Data;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace AuthService
 {
@@ -10,9 +14,40 @@ namespace AuthService
         {
             var builder = WebApplication.CreateBuilder(args);
 
+
             builder.Services.AddSingleton<IDbConnectionFactory>(_ =>
                 new NpgsqlConnectionFactory(builder.Configuration.GetConnectionString("DefaultConnection")!));
             builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+            builder.Services.AddScoped<IAuthServiceLogic, AuthServiceLogic>();
+            builder.Services.AddScoped<ITokenGenerator, JwtTokenGenerator>();
+            //builder.Services.Configure<PasswordHasherOptions>(options =>
+            //{
+            //    // Можно оставить пустым, тогда используются значения по умолчанию
+            //    // options.IterationCount = 100000;
+            //});
+            builder.Services.AddScoped<IPasswordHasher<AuthLogic.Models.IdentityUser>, PasswordHasher<AuthLogic.Models.IdentityUser>>();
+
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen();
+
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                        ValidAudience = builder.Configuration["Jwt:Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(
+                            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Secret"]!))
+                    };
+                });
+
+            builder.Services.AddAuthorization();
 
             var app = builder.Build();
 
@@ -29,17 +64,16 @@ namespace AuthService
                 );
             ");
 
-            //app.MapPost("/register", async (RegisterRequest request, IAuthService authService) =>
-            //{
-            //    var result = await authService.RegisterAsync(request.Email, request.Password);
-            //    return result.Succeeded ? Results.Ok() : Results.BadRequest(result.Errors);
-            //});
+            if (app.Environment.IsDevelopment())
+            {
+                app.UseSwagger();
+                app.UseSwaggerUI();
+            }
 
-            //app.MapPost("/login", async (LoginRequest request, IAuthService authService) =>
-            //{
-            //    var token = await authService.LoginAsync(request.Email, request.Password);
-            //    return token is not null ? Results.Ok(new { Token = token }) : Results.Unauthorized();
-            //});
+            app.UseAuthentication();
+            app.UseAuthorization();
+
+            app.MapAuthEndpoints();
 
             app.Run();
         }
