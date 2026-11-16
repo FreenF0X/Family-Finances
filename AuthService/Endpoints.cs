@@ -17,7 +17,12 @@ namespace AuthService
                     request.Login, request.Password, request.Email);
 
                 return result.ToHttpResult();
-            });
+            })
+            .WithSummary("Регистрация пользователя")
+            .WithDescription("Создает нового пользователя и сразу возвращает JWT токены.")
+            .Produces<AuthResponse>(StatusCodes.Status200OK) // Успех
+            .Produces<ErrorResponse>(StatusCodes.Status400BadRequest) // Ошибки бизнес-логики
+            .Produces<ErrorResponse>(StatusCodes.Status409Conflict); // Логин занят
 
             group.MapPost("/login", async (
                 LoginRequest request,
@@ -25,7 +30,10 @@ namespace AuthService
             {
                 var result = await authService.LoginAsync(request.Login, request.Password);
                 return result.ToHttpResult();
-            });
+            })
+            .WithSummary("Вход в систему")
+            .Produces<AuthResponse>(StatusCodes.Status200OK)
+            .Produces<ErrorResponse>(StatusCodes.Status401Unauthorized);
 
             group.MapPost("/refresh", async (
                 RefreshTokenRequest request,
@@ -33,7 +41,10 @@ namespace AuthService
             {
                 var result = await authService.RefreshTokenAsync(request.RefreshToken);
                 return result.ToHttpResult();
-            });
+            })
+            .WithSummary("Обновление access-токена")
+            .Produces<AuthResponse>(StatusCodes.Status200OK)
+            .Produces<ErrorResponse>(StatusCodes.Status401Unauthorized);
 
             group.MapPost("/change-password", async (
                 ChangePasswordRequest request,
@@ -56,7 +67,12 @@ namespace AuthService
                 // Успех — без тела
                 return Results.NoContent();
             })
-            .RequireAuthorization(); // смена пароля только для залогиненных
+            .RequireAuthorization()
+            .WithSummary("Смена пароля")
+            .WithDescription("Требует передачи access-токена в заголовке Authorization.")
+            .Produces(StatusCodes.Status204NoContent) // Успех (пустой ответ)
+            .Produces<ErrorResponse>(StatusCodes.Status400BadRequest)
+            .Produces<ErrorResponse>(StatusCodes.Status401Unauthorized);
 
             group.MapPost("/logout", async (
                 IAuthServiceLogic authService,
@@ -71,7 +87,11 @@ namespace AuthService
                 await authService.LogoutAsync(userId);
                 return Results.NoContent();
             })
-            .RequireAuthorization();
+            .RequireAuthorization()
+            .WithSummary("Выход из системы")
+            .WithDescription("Отзывает refresh-токен пользователя.")
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces(StatusCodes.Status401Unauthorized);
 
             return app;
         }

@@ -27,7 +27,7 @@ services:
       - ConnectionStrings__DefaultConnection=${CONNECTION_STRING}
       - ASPNETCORE_URLS=http://+:5244 ##;https://+:7140
     depends_on:
-      postgres:
+      budget_postgres:
         condition: service_healthy
     restart: unless-stopped
 
