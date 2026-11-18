@@ -1,6 +1,7 @@
 ﻿using BudgetService.Contracts;
 using BusinesLogic;
 using Domain.Models;
+using System.Security.Claims;
 
 namespace BudgetService.Endpoints
 {
@@ -8,15 +9,19 @@ namespace BudgetService.Endpoints
     {
         public static void MapTransactionEndpoints(this IEndpointRouteBuilder app)
         {
-            var group = app.MapGroup("/api/transactions");
+            var group = app.MapGroup("/api/transactions")
+                .RequireAuthorization()
+                .WithTags("Transactions");
 
             // CREATE
-            group.MapPost("/", async (CreateTransactionRequest request, TransactionService service) =>
+            group.MapPost("/", async (CreateTransactionRequest request, TransactionService service, HttpContext httpContext) =>
             {
                 try
                 {
-                    // TODO: Позже заменим этот хардкод на реальный ID из JWT-токена
-                    var hardcodedUserId = Guid.Parse("0dab9965-2e3e-4f0d-a3de-491526a10410");
+                    // Достаем ID пользователя из JWT-токена
+                    var hardcodedUserId = Guid.Parse(httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                                            ?? httpContext.User.FindFirst("sub")?.Value
+                                            ?? throw new Exception("User ID not found in token"));
 
                     var transaction = await service.CreateAsync(
                         request.AccountId,
@@ -42,7 +47,12 @@ namespace BudgetService.Endpoints
                 {
                     return Results.BadRequest(ex.Message);
                 }
-            });
+            })
+            .WithSummary("Создание транзакции")
+            .WithDescription("Создает новую транзакцию (доход или расход) и привязывает её к счету и категории. ID пользователя берется из JWT.")
+            .Produces<TransactionResponse>(StatusCodes.Status201Created)
+            .Produces<string>(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status401Unauthorized);
 
             // READ (по счету)
             group.MapGet("/account/{accountId:guid}", async (Guid accountId, TransactionService service) =>
@@ -60,7 +70,11 @@ namespace BudgetService.Endpoints
                     t.CreatedAt));
 
                 return Results.Ok(response);
-            });
+            })
+            .WithSummary("Получение транзакций по счету")
+            .WithDescription("Возвращает список всех транзакций, привязанных к указанному счету.")
+            .Produces<IEnumerable<TransactionResponse>>(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status401Unauthorized);
         }
     }
 }

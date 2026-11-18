@@ -1,0 +1,25 @@
+﻿# 1. Базовый образ для запуска (Runtime)
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+EXPOSE 7196
+EXPOSE 5242
+WORKDIR /app
+
+# 2. Образ для сборки (SDK)
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+
+# Копируем csproj и восстанавливаем зависимости (для кэширования слоев)
+COPY ["AuthService/AuthService.csproj", "AuthService/"]
+COPY ["AuthLogic/AuthLogic.csproj", "AuthLogic/"]
+RUN dotnet restore "AuthService/AuthService.csproj"
+
+# Копируем все остальные файлы и собираем
+COPY . .
+WORKDIR "/src/AuthService"
+RUN dotnet publish "AuthService.csproj" -c Release -o /app/publish /p:UseAppHost=false
+
+# 3. Финальный образ
+FROM base AS final
+WORKDIR /app
+COPY --from=build /app/publish .
+ENTRYPOINT ["dotnet", "AuthService.dll"]

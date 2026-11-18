@@ -14,18 +14,13 @@ namespace AuthService
         {
             var builder = WebApplication.CreateBuilder(args);
 
-
             builder.Services.AddSingleton<IDbConnectionFactory>(_ =>
                 new NpgsqlConnectionFactory(builder.Configuration.GetConnectionString("DefaultConnection")!));
             builder.Services.AddScoped<IUserRepository, UserRepository>();
 
             builder.Services.AddScoped<IAuthServiceLogic, AuthServiceLogic>();
             builder.Services.AddScoped<ITokenGenerator, JwtTokenGenerator>();
-            //builder.Services.Configure<PasswordHasherOptions>(options =>
-            //{
-            //    // Можно оставить пустым, тогда используются значения по умолчанию
-            //    // options.IterationCount = 100000;
-            //});
+            
             builder.Services.AddScoped<IPasswordHasher<AuthLogic.Models.IdentityUser>, PasswordHasher<AuthLogic.Models.IdentityUser>>();
 
             builder.Services.AddEndpointsApiExplorer();

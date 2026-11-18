@@ -15,21 +15,54 @@ services:
       timeout: 5s
       retries: 10
 
+  auth_postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${AUTH_DB_USER}
+      POSTGRES_PASSWORD: ${AUTH_DB_PASSWORD}
+      POSTGRES_DB: ${AUTH_DB_NAME}
+    ports:
+      - "5434:5432"
+    volumes:
+      - auth_postgres_data:/var/lib/auth_postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${AUTH_DB_USER} -d ${AUTH_DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
   budget_service:
     build:
       context: .
       dockerfile: BudgetService/Dockerfile
     ports:
       ##- "7140:7140"
-      - "5244:5244"
+      - "5242:5242"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=${CONNECTION_STRING}
-      - ASPNETCORE_URLS=http://+:5244 ##;https://+:7140
+      - ASPNETCORE_URLS=http://+:5242 ##;https://+:7140
     depends_on:
       budget_postgres:
         condition: service_healthy
     restart: unless-stopped
 
+  auth_service:
+    build:
+      context: .
+      dockerfile: AuthService/Dockerfile
+    ports:
+      ##- "7140:7140"
+      - "5244:5244"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=${AUTH_CONNECTION_STRING}
+      - ASPNETCORE_URLS=http://+:5244 ##;https://+:7140
+    depends_on:
+      auth_postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
 volumes:
   postgres_data:
+  auth_postgres_data:  
