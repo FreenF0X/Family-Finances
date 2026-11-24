@@ -1,0 +1,26 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "AnalyticsService.Protos";
+
+package analytics;
+
+service Analytics {
+  rpc GetMonthlyReport (MonthlyReportRequest) returns (MonthlyReportResponse);
+}
+
+message MonthlyReportRequest {
+  string family_id = 1;
+  int32 year = 2;
+  int32 month = 3;
+}
+
+message MonthlyReportResponse {
+  repeated CategorySummary categories = 1;
+  double total_expenses = 2;
+  double total_incomes = 3;
+}
+
+message CategorySummary {
+  string category_name = 1;
+  double amount = 2;
+}

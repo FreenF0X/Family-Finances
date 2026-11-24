@@ -1,3 +1,4 @@
+
 using BudgetService.Endpoints;
 using BusinesLogic;
 using DataAccess;
@@ -6,6 +7,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using BudgetService.Protos;
+using Grpc;
 
 
 namespace BudgetService
@@ -70,6 +73,12 @@ namespace BudgetService
                 });
             });
 
+            // Регистрация grpc-клиента
+            builder.Services.AddGrpcClient<Analytics.AnalyticsClient>(o =>
+            {
+                o.Address = new Uri(builder.Configuration["GrpcSettings:AnalyticsServiceUrl"]!);
+            });
+
             var app = builder.Build();
 
             if (app.Environment.IsDevelopment())
@@ -85,6 +94,7 @@ namespace BudgetService
             app.MapAccountEndpoints();
             app.MapCategoryEndpoints();
             app.MapTransactionEndpoints();
+            app.MapAnalyticsEndpoints();
 
             app.Run();
         }

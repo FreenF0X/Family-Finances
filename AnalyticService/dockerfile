@@ -1,0 +1,23 @@
+﻿# 1. Базовый образ для запуска (Runtime)
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+EXPOSE 5276
+WORKDIR /app
+
+# 2. Образ для сборки (SDK)
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+
+# Копируем csproj и восстанавливаем зависимости (для кэширования слоев)
+COPY ["AnalyticService/AnalyticService.csproj", "AnalyticService/"]
+RUN dotnet restore "AnalyticService/AnalyticService.csproj"
+
+# Копируем все остальные файлы и собираем
+COPY . .
+WORKDIR "/src/AnalyticService"
+RUN dotnet publish "AnalyticService.csproj" -c Release -o /app/publish /p:UseAppHost=false
+
+# 3. Финальный образ
+FROM base AS final
+WORKDIR /app
+COPY --from=build /app/publish .
+ENTRYPOINT ["dotnet", "AnalyticService.dll"]
