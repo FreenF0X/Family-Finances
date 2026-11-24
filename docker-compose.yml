@@ -42,7 +42,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=${CONNECTION_STRING}
       - ASPNETCORE_URLS=http://+:5242 ##;https://+:7140
-      - GrpcSettings__AnalyticsServiceUrl=http://analytic_service:5246
+      - GrpcSettings__AnalyticsServiceUrl=http://analytic_service:5276
     depends_on:
       budget_postgres:
         condition: service_healthy
