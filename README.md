@@ -27,7 +27,7 @@
 - [x] Этап 0: подготовка репозитория
 - [x] Этап 1: ядро Budget Service (CRUD + PostgreSQL)
 - [x] Этап 2: Auth Service + JWT
-- [ ] Этап 3: gRPC между Budget и Analytics
+- [x] Этап 3: gRPC между Budget и Analytics
 - [ ] Этап 4: Kafka и события
 - [ ] Этап 5: ClickHouse и read-модель
 - [ ] Этап 6: мониторинг (Prometheus + Grafana)
