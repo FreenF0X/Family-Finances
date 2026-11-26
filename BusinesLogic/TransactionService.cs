@@ -1,10 +1,12 @@
-﻿using DataAccess;
+﻿using Confluent.Kafka;
+using DataAccess;
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace BusinesLogic
@@ -12,10 +14,12 @@ namespace BusinesLogic
     public class TransactionService
     {
         private readonly BudgetDbContext _dbContext;
+        private readonly IProducer<string, string> _producer;
 
-        public TransactionService(BudgetDbContext dbContext)
+        public TransactionService(BudgetDbContext dbContext, IProducer<string, string> producer)
         {
             _dbContext = dbContext;
+            _producer = producer;
         }
 
         public async Task<Transaction> CreateAsync(
@@ -69,6 +73,22 @@ namespace BusinesLogic
             // 5. Сохраняем всё вместе (транзакция и изменение баланса)
             _dbContext.Transactions.Add(transaction);
             await _dbContext.SaveChangesAsync();
+
+            var @event = new
+            {
+                TransactionId = transaction.Id,
+                AccountId = transaction.AccountId,
+                CategoryId = transaction.CategoryId,
+                Amount = transaction.Amount,
+                Date = transaction.Date,
+                Type = (int)transaction.Type
+            };
+
+            await _producer.ProduceAsync("transactions", new Message<string, string>
+            {
+                Key = transaction.Id.ToString(), // Ключ для партиционирования
+                Value = JsonSerializer.Serialize(@event)
+            });
 
             return transaction;
         }

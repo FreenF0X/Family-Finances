@@ -9,6 +9,7 @@ using Microsoft.OpenApi.Models;
 using System.Text;
 using BudgetService.Protos;
 using Grpc;
+using Confluent.Kafka;
 
 
 namespace BudgetService
@@ -77,6 +78,16 @@ namespace BudgetService
             builder.Services.AddGrpcClient<Analytics.AnalyticsClient>(o =>
             {
                 o.Address = new Uri(builder.Configuration["GrpcSettings:AnalyticsServiceUrl"]!);
+            });
+
+            // Регистрация Kafka Producer
+            builder.Services.AddSingleton<IProducer<string, string>>(sp =>
+            {
+                var config = new ProducerConfig
+                {
+                    BootstrapServers = builder.Configuration["Kafka:BootstrapServers"] // Добавим в appsettings
+                };
+                return new ProducerBuilder<string, string>(config).Build();
             });
 
             var app = builder.Build();
